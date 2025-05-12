@@ -1,0 +1,55 @@
+!pip install -q dash
+!pip install -q dash-core-components
+!pip install -q dash-html-components
+!pip install -q dash-bootstrap-components
+!pip install -q dash-ag-grid
+!pip install jupyter-dash
+
+
+
+from dash import Dash, html, dcc, callback, Output, Input, jupyter_dash
+
+
+
+jupyter_dash.default_mode="external"
+jupyter_dash.inline_exceptions = False
+
+import dash_bootstrap_components as dbc
+from dash import Dash, html, dcc
+from dash.dependencies import Input, Output
+
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+app.layout = html.Div([
+    html.H1("Columns of Transit Data"),
+    dcc.Dropdown(
+        id='column-dropdown',
+        options=[{'label': col, 'value': col} for col in data.columns],
+        value=data.columns[0],  # Default to the first column
+        multi=True  # Allow multiple column selection
+
+        
+    ),
+    dcc.Graph(figure=fig),
+    html.Div(id='column-output'),
+])
+
+
+@app.callback(
+    Output('column-output', 'children'),
+    Input('column-dropdown', 'value')
+)
+def update_output(selected_columns):
+    if selected_columns is None or len(selected_columns) == 0:
+        return "Select columns to display."
+
+    return html.Table([
+        html.Thead(html.Tr([html.Th(col) for col in selected_columns])),
+        html.Tbody([
+            html.Tr([html.Td(data.loc[i, col]) for col in selected_columns]) for i in range(min(100, len(data)))
+        ])
+    ])
+
+
+if __name__ == '__main__':
+    app.run(mode='external')
