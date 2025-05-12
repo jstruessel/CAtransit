@@ -5,7 +5,12 @@
 !pip install -q dash-ag-grid
 !pip install jupyter-dash
 
+import plotly.express as px
 
+fig = px.scatter_mapbox(data_filtered, lat="Y", lon="X", color="avg_trips_per_peak_hr", zoom=6, height=600, width=800)
+fig.update_layout(mapbox_style="open-street-map")
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+fig.show()
 
 from dash import Dash, html, dcc, callback, Output, Input, jupyter_dash
 
