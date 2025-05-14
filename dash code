@@ -25,6 +25,14 @@ from dash.dependencies import Input, Output
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
+fig1 = go.Figure(data=[go.Bar(x=data['hqta_type'], y=data['avg_trips_per_peak_hr'])]) # Example of bar graph
+fig1.update_layout(title="HQTA Type vs. Average Trips per Peak Hour", xaxis_title="HQTA Type", yaxis_title="Average Trips per Peak Hour")
+
+
+fig2 = go.Figure(data=[go.Bar(x=top_10_agencies.index, y=top_10_agencies.values)]) # Example of bar graph
+fig2.update_layout(title="Top 10 Agencies by Average Trips per Peak Hour", xaxis_title="Agency Primary", yaxis_title="Average Trips per Peak Hour", xaxis={'categoryorder':'total descending'})
+
+
 app.layout = html.Div([
     html.H1("Columns of Transit Data"),
     dcc.Dropdown(
@@ -32,10 +40,10 @@ app.layout = html.Div([
         options=[{'label': col, 'value': col} for col in data.columns],
         value=data.columns[0],  # Default to the first column
         multi=True  # Allow multiple column selection
-
-        
     ),
-    dcc.Graph(figure=fig),
+    dcc.Graph(id='map-graph', figure=fig),  # Incorporate the mapbox
+    dcc.Graph(id='bar-graph1', figure=fig1), # Add the first bar graph
+    dcc.Graph(id='bar-graph2', figure=fig2), # Add the second bar graph
     html.Div(id='column-output'),
 ])
 
@@ -54,6 +62,10 @@ def update_output(selected_columns):
             html.Tr([html.Td(data.loc[i, col]) for col in selected_columns]) for i in range(min(100, len(data)))
         ])
     ])
+
+
+if __name__ == '__main__':
+    app.run(mode='external')
 
 
 if __name__ == '__main__':
